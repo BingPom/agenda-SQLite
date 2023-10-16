@@ -18,7 +18,6 @@ public class Menu {
 				"Mostrar la agenda", 
 				"Añadir un contacto", 
 				"Eliminar un contacto",
-				"Pack",
 				"Salir");
 		
 		while (true) {
@@ -38,9 +37,6 @@ public class Menu {
 				break;
 			case 'E':
 				borrarContacto(agenda);
-				break;
-			case 'P': // Quitar borrados
-				agenda.pack();
 				break;
 			case 'S':
 				cerrarAgenda(agenda);
@@ -80,15 +76,13 @@ public class Menu {
 	private static void buscarPorInicioDelNombre(AgendaSQLite agenda) {
 		IO.print("El nombre empieza por ? ");
 		String inicio = IO.readString();
-		List<?> contactos = agenda.buscarPorNombre(inicio);
-		IO.println(contactos);
+		IO.println(agenda.buscarPorNombre(inicio));
 	}
 
 	private static void buscarPorCodigo(AgendaSQLite agenda) {
 		IO.print("Código ? ");
 		String id = IO.readString();
-		Contacto contacto = agenda.buscarPorCodigo(id);
-		IO.println(contacto);
+		IO.println(agenda.buscarPorCodigo(id));
 	}
 
 }
