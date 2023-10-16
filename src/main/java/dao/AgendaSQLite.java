@@ -1,11 +1,15 @@
 package dao;
 
-import java.io.FileNotFoundException;
+import java.sql.Statement;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +17,15 @@ import java.util.UUID;
 import model.Contacto;
 
 public class AgendaSQLite {
+	
+//	Datos de la conexión SQLite
+	String dsn = "jdbc:sqlite:db.sqlite";
+	String user= "";
+	String pass = "";
+	String sql = "";
+	
+	Connection conn = null;
+	Statement stmt = null;
 	
 	final private static String FILE = "agenda.dat";
 	final private static String DELETED = "00000000-0000-0000-0000-000000000000";
@@ -31,10 +44,13 @@ public class AgendaSQLite {
 	 */
 	private void open() {
 		try {
-			if (raf == null) {
-				raf = new RandomAccessFile(FILE, "rw");
+			if (conn == null) {
+				conn = DriverManager.getConnection(dsn, user, pass);
+				sql = "create TABLE IF not EXISTS agenda (uuid STRING PRIMARY KEY, nombre STRING NOT NULL, telefono STRING, edad INTEGER)";
+				stmt = conn.createStatement();
+				stmt.executeUpdate(sql);
 			}
-		} catch (FileNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}		
 	}
@@ -43,12 +59,13 @@ public class AgendaSQLite {
 	 * Cierra la agenda
 	 */
 	public void close() {
-		if (raf != null) {
+		if (conn != null) {
 			try {
-				raf.close();
-			} catch (IOException e) {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
 			} finally {
-				raf = null;
+				conn = null;
 			}
 		}
 	}
@@ -63,24 +80,9 @@ public class AgendaSQLite {
 	public String show() {
 		StringBuffer sb = new StringBuffer();
 		try {
-			raf.seek(0L);
-			while (raf.getFilePointer() < raf.length()) {
-				String sUuid = raf.readUTF();
-				UUID uuid = UUID.fromString(sUuid);
-				String nombre = raf.readUTF();
-				String telefono = raf.readUTF();
-				int edad = raf.readInt();
-				Contacto c = new Contacto(uuid, nombre, telefono, edad);
-				if (sUuid.equals(DELETED)) {
-					sb.append("borrado > ");
-					sb.append(c.toString());
-					sb.append("\n");
-				} else {
-					sb.append(c.toString());
-					sb.append("\n");					
-				}
-			}
-		} catch (IOException e) {
+			sql = "SELECT * FROM agenda";
+			sb.append(stmt.executeUpdate(sql));
+		} catch (SQLException e) {
 			return "";
 		}
 		return sb.toString();		
@@ -92,36 +94,15 @@ public class AgendaSQLite {
 	 * @param codigo
 	 * @return null
 	 */
-	public Contacto buscarPorCodigo(String id) {
+	public String buscarPorCodigo(UUID id) {
+		StringBuffer sb = new StringBuffer();
 		try {
-			UUID uuid = UUID.fromString(id);
-			return buscarPorCodigo(uuid);
-		} catch (Exception e) {			
-		}
-		return null;
-	}
-
-	/**
-	 * Buscar un contacto conociendo su identificador
-	 * 
-	 * @param codigo
-	 * @return null
-	 */
-	private Contacto buscarPorCodigo(UUID id) {
-		try {
-			raf.seek(0L);
-			while (raf.getFilePointer() < raf.length()) {
-				String sUuid = raf.readUTF();
-				UUID uuid = UUID.fromString(sUuid);
-				String nombre = raf.readUTF();
-				String telefono = raf.readUTF();
-				int edad = raf.readInt();
-				Contacto c = new Contacto(uuid, nombre, telefono, edad);
-				if (uuid.equals(id)) {
-					return c;
-				}
-			}
-		} catch (IOException e) {
+			sql = "SELECT * FROM agenda WHERE uuid = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, id.toString());
+			sb.append(ps.executeQuery());
+			return sb.toString();
+		} catch (SQLException e) {
 		}
 		return null;
 	}

@@ -2,14 +2,14 @@ package view;
 
 import java.util.List;
 
-import dao.Agenda;
+import dao.AgendaSQLite;
 import io.IO;
 import model.Contacto;
 
 public class Menu {
 	
 	public static void main(String[] args) {
-		Agenda agenda = new Agenda();
+		AgendaSQLite agenda = new AgendaSQLite();
 //		agenda.drop();
 		
 		List<String> opciones = List.of( 
@@ -51,18 +51,18 @@ public class Menu {
 		
 	}
 
-	private static void cerrarAgenda(Agenda agenda) {
+	private static void cerrarAgenda(AgendaSQLite agenda) {
 		agenda.close();
 	}
 
-	private static void borrarContacto(Agenda agenda) {
+	private static void borrarContacto(AgendaSQLite agenda) {
 		IO.print("Código ? ");
 		String id = IO.readString();
 		boolean borrado = agenda.delete(id);
 		IO.println(borrado ? "Borrado" : "No se ha podido borrar");
 	}
 
-	private static void anadirContacto(Agenda agenda) {
+	private static void anadirContacto(AgendaSQLite agenda) {
 		IO.print("Nombre ? ");
 		String nombre = IO.readString();
 		IO.print("Teléfono ? ");
@@ -73,18 +73,18 @@ public class Menu {
 		IO.println(anadido ? "Añadido" : "No se ha podido añadir");
 	}
 
-	private static void mostrar(Agenda agenda) {
+	private static void mostrar(AgendaSQLite agenda) {
 		System.out.println(agenda.show());
 	}
 
-	private static void buscarPorInicioDelNombre(Agenda agenda) {
+	private static void buscarPorInicioDelNombre(AgendaSQLite agenda) {
 		IO.print("El nombre empieza por ? ");
 		String inicio = IO.readString();
 		List<?> contactos = agenda.buscarPorNombre(inicio);
 		IO.println(contactos);
 	}
 
-	private static void buscarPorCodigo(Agenda agenda) {
+	private static void buscarPorCodigo(AgendaSQLite agenda) {
 		IO.print("Código ? ");
 		String id = IO.readString();
 		Contacto contacto = agenda.buscarPorCodigo(id);
