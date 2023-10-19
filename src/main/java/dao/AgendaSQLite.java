@@ -155,12 +155,7 @@ public class AgendaSQLite {
 	 */
 	public void drop() {
 		try {
-//			La borramos
-			sql = "DROP TABLE IF EXISTS agenda";
-			stmt.executeUpdate(sql);
-			
-//			La volvemos a crear
-			sql = "CREATE TABLE IF NOT EXISTS agenda (uuid STRING PRIMARY KEY, nombre STRING NOT NULL, telefono STRING, edad INTEGER)";
+			sql = "DELETE FROM agenda";
 			stmt.executeUpdate(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
