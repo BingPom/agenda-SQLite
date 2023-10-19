@@ -1,0 +1,11 @@
+# SQLite Connection
+db = sqlite
+driver = org.sqlite.JDBC
+dsn = jdbc:sqlite:agenda.sqlite
+
+# MariaDB Connection
+db = mariadb
+driver = org.mariadb.jdbc
+dsn = jdbc:mariadb://127.0.0.1:0000/test
+user = root
+pass = toor
